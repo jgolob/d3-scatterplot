@@ -255,11 +255,12 @@
                 .attr('class', 'point');
             var points = svg_g.selectAll('circle.point');
             points
-                .attr('cx', function(d){ return X(d.x); })
-                .attr('cy', function(d){ return Y(d.y); })
                 .attr('r', 3)
-                .style('fill', function(d){ return hue_scale(d.hue); })
-                .style('alpha', 0.8);
+                .style('alpha', 0.8)
+                .transition()
+                    .attr('cx', function(d){ return X(d.x); })
+                    .attr('cy', function(d){ return Y(d.y); })
+                    .style('fill', function(d){ return hue_scale(d.hue); });
         }
 
         // jquery function that triggers when the page is finished loading.
