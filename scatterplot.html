@@ -22,6 +22,9 @@
             // Bind the data to the div
             div.datum(data);
             // Insert a select of possible X values
+            div.append('label')
+                .attr('for', 'x_select')
+                .text("X: ");
             var x_select = div.append('select')
                 .attr('id', 'x_select');
             // This is a demo of binding elements to a data source
@@ -46,6 +49,9 @@
                 .text(function(d){ return d;});
             
             // Same again, but for Y
+            div.append('label')
+                .attr('for', 'y_select')
+                .text("Y: ");            
             var y_select = div.append('select')
                 .attr('id', 'y_select');            
             var y_select_options = y_select.selectAll('option')
@@ -165,13 +171,14 @@
             // Make some scales
 
             // Can use the size of the group plus the margins to set the range of the scale.
+            
             var X = d3.scaleLinear()
                 .range([
                     MARGINS.L,
                     width - MARGINS.L - MARGINS.R
                 ])
                 .domain([
-                    X_min * 0.8,
+                    Math.min(X_min * 1.1, -0.5),
                     X_max * 1.1
                 ]);
             // For Y, we reverse the range as the origin is the top
@@ -181,7 +188,7 @@
                     MARGINS.T
                 ])
                 .domain([
-                    Y_min * 0.8,
+                    Math.min(Y_min * 1.1, -0.5),
                     Y_max * 1.1,
                 ]);
             
@@ -194,11 +201,6 @@
             var Yaxis_g = svg_g.select('g#yAxis')
                 .attr('transform', 'translate('+MARGINS.L+','+(MARGINS.T)+')')
                 .call(Yaxis);
-
-
-
-            console.log(Y(50));
-            console.log(Y(100));
 
             // OK! Plot some points
             var points = svg_g.selectAll('circle.point')
