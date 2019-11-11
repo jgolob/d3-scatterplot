@@ -281,7 +281,6 @@
                 .attr('r', 3)
                 .style('alpha', 0.8)
                 .on('mouseover', function(d) {
-                    console.log(d);
                     tooltip
                         .html(d.name)
                         .style("left", (d3.event.pageX) + "px")		
