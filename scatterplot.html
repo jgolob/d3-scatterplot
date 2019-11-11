@@ -8,6 +8,18 @@
         body {
             font-family: sans-serif;
         }
+        div#tooltip {	
+            position: absolute;			
+            text-align: center;			
+            
+            padding: 2px;				
+            font: 12px sans-serif;		
+            background: lightsteelblue;	
+            border: 0px;		
+            border-radius: 8px;			
+            pointer-events: none;
+            z-index: 10;			
+        }
     </style>
     <script> 
         var MARGINS = {
@@ -17,6 +29,10 @@
             'B': 40
         }
         function scatterPlot_init(div_id, data) {
+            // Define the div for the tooltip
+            var div = d3.select("body").append("div")	
+                .attr("id", "tooltip")				
+                .style("opacity", 0);
             // Use the ID passed as a parameter to grab the div
             var div = d3.select(div_id);
             // Change some attributes on the DIV, to resize it
@@ -56,7 +72,7 @@
             // Same again, but for Y
             div.append('label')
                 .attr('for', 'y_select')
-                .text("Y: ");            
+                .text(" Y: ");            
             var y_select = div.append('select')
                 .attr('id', 'y_select');            
             var y_select_options = y_select.selectAll('option')
@@ -77,7 +93,7 @@
             // Same again, but for Hue
             div.append('label')
                 .attr('for', 'hue_select')
-                .text("Hue: ");            
+                .text(" Hue: ");            
             var hue_select = div.append('select')
                 .attr('id', 'hue_select');            
             var hue_select_options = hue_select.selectAll('option')
@@ -133,8 +149,9 @@
         }
 
         function scatterPlot_update(div_id) {
-            // grab the div by ID
+            // grab the divs by ID
             var div = d3.select(div_id);
+            var tooltip = d3.select('div#tooltip');
             // get the data bound to the div
             var data = div.datum();
             // Get the SVG and SVG_g within
@@ -249,7 +266,8 @@
                     return {
                         'x': parseFloat(v[x_cat]),
                         'y': parseFloat(v[y_cat]),
-                        'hue': v[hue]
+                        'hue': v[hue],
+                        'name': v['Cereal Name']
                     }
                 }));
                 // bind the data
@@ -262,6 +280,21 @@
             points
                 .attr('r', 3)
                 .style('alpha', 0.8)
+                .on('mouseover', function(d) {
+                    console.log(d);
+                    tooltip
+                        .html(d.name)
+                        .style("left", (d3.event.pageX) + "px")		
+                        .style("top", (d3.event.pageY - 28) + "px");
+                    tooltip
+                        .transition()
+                            .style('opacity', 0.9);
+                })
+                .on('mouseout', function(){
+                    tooltip
+                        .transition()
+                            .style('opacity', 0);
+                })
                 .transition() // This animates the following changes (position and color). 
                     .attr('cx', function(d){ return X(d.x); })
                     .attr('cy', function(d){ return Y(d.y); })
