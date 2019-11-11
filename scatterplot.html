@@ -68,7 +68,27 @@
             y_select_options = y_select.selectAll('option');
             y_select_options
                 .text(function(d){ return d;});
-        
+
+            // Same again, but for Hue
+            div.append('label')
+                .attr('for', 'hue_select')
+                .text("Hue: ");            
+            var hue_select = div.append('select')
+                .attr('id', 'hue_select');            
+            var hue_select_options = hue_select.selectAll('option')
+                .data(Object.keys(data[0]).reduce(
+                    function (p, c) {
+                        if (!/^[\d\.]+$/.test(data[0][c])){
+                            p.push(c);
+                        }
+                        return p;
+                    }, []));
+            hue_select_options.exit().remove();
+            hue_select_options.enter()
+                .append('option');
+            hue_select_options = hue_select.selectAll('option');
+            hue_select_options
+                .text(function(d){ return d;});        
             
             // Add an SVG element;
             var svg = div.append('svg')
@@ -101,6 +121,10 @@
                 .on('change', function() {
                     scatterPlot_update(div_id);
                 });
+            hue_select
+                .on('change', function() {
+                    scatterPlot_update(div_id);
+                });
         }
 
         function scatterPlot_update(div_id) {
@@ -118,10 +142,11 @@
             // Now the selects to figure out we are graphing
             var select_X = div.select('select#x_select');
             var select_Y = div.select('select#y_select');
+            var select_hue = div.select('select#hue_select');
             // Get the selected values
             var x_cat = select_X.node().value;
             var y_cat = select_Y.node().value;
-
+            var hue = select_hue.node().value;
             // Figure out the domain of each by reducing the main data list
             var X_min = data.reduce(function(p, c){
                 var val = parseFloat(c[x_cat])
@@ -168,6 +193,14 @@
                 }
             }, undefined);
 
+            var hue_val = data.reduce(function(p, c) {
+                    if (p.indexOf(c[hue]) == -1){
+                        p.push(c[hue]);
+                    }
+                    return p;
+                }, [])
+            
+
             // Make some scales
 
             // Can use the size of the group plus the margins to set the range of the scale.
@@ -192,6 +225,9 @@
                     Y_max * 1.1,
                 ]);
             
+            var hue_scale =  d3.scaleOrdinal(d3.schemeTableau10)
+                .domain(hue_val);
+            
             // Axes
             var Xaxis = d3.axisBottom(X);
             var Xaxis_g = svg_g.select('g#xAxis')
@@ -207,7 +243,8 @@
                 .data(data.map(function (v){
                     return {
                         'x': parseFloat(v[x_cat]),
-                        'y': parseFloat(v[y_cat])
+                        'y': parseFloat(v[y_cat]),
+                        'hue': v[hue]
                     }
                 }));
                 // bind the data
@@ -221,7 +258,7 @@
                 .attr('cx', function(d){ return X(d.x); })
                 .attr('cy', function(d){ return Y(d.y); })
                 .attr('r', 3)
-                .style('fill', 'steelblue')
+                .style('fill', function(d){ return hue_scale(d.hue); })
                 .style('alpha', 0.8);
         }
 
