@@ -4,6 +4,11 @@
     <title>Scatterplot Demo</title>
     <script src="http://d3js.org/d3.v5.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+    </style>
     <script> 
         var MARGINS = {
             'L': 40,
@@ -257,7 +262,7 @@
             points
                 .attr('r', 3)
                 .style('alpha', 0.8)
-                .transition()
+                .transition() // This animates the following changes (position and color). 
                     .attr('cx', function(d){ return X(d.x); })
                     .attr('cy', function(d){ return Y(d.y); })
                     .style('fill', function(d){ return hue_scale(d.hue); });
